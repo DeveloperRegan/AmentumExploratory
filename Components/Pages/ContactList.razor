@@ -1,0 +1,45 @@
+﻿@page "/ContactList"
+
+<div class="d-flex align-items-center gap-1 mb-3">
+    <div class="input-group flex-grow-1">
+        <InputText class="form-control" placeholder="Search Here..." @bind-Value="SearchText" />
+        <button class="btn btn-secondary" type="button" @onclick="Filter">Search</button>
+    </div>
+
+    <div class="btn-group" role="group">
+        <input type="checkbox" class="btn-check" id="reasonGeneral" autocomplete="off" checked @onchange="() => ToggleFilter(ContactReason.General)">
+        <label class="btn btn-outline-primary" for="reasonGeneral">@ContactReason.General</label>
+
+        <input type="checkbox" class="btn-check" id="reasonInquiry" autocomplete="off" checked @onchange="() => ToggleFilter(ContactReason.Inquiry)">
+        <label class="btn btn-outline-primary" for="reasonInquiry">@ContactReason.Inquiry</label>
+
+        <input type="checkbox" class="btn-check" id="reasonPricing" autocomplete="off" checked @onchange="() => ToggleFilter(ContactReason.Pricing)">
+        <label class="btn btn-outline-primary" for="reasonPricing">@ContactReason.Pricing</label>
+
+        <input type="checkbox" class="btn-check" id="reasonOther" autocomplete="off" checked @onchange="() => ToggleFilter(ContactReason.Other)">
+        <label class="btn btn-outline-primary" for="reasonOther">@ContactReason.Other</label>
+    </div>
+</div>
+
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in FilteredList)
+            {
+                <tr>
+                    <td scope="row">@contact.Name</td>
+                    <td>@contact.Email</td>
+                    <td>@contact.Reason</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

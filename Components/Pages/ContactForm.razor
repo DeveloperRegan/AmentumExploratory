@@ -1,0 +1,40 @@
+﻿@page "/ContactForm"
+
+<EditForm id="contactForm" Model="ContactInformation" class="border border-1 rounded shadow p-3 mx-auto" OnValidSubmit="SubmitForm">
+    <div class="mb-3">
+        <label for="contactReason" class="form-label">Subject</label>
+        <InputSelect id="contactReason" class="form-control" @bind-Value="ContactInformation.Reason">
+            @foreach (ContactReason reason in ContactReasons)
+            {
+                <option value="@reason">@reason</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="contactName" class="form-label">Name</label>
+        <InputText id="contactName" class="form-control" @bind-Value="ContactInformation.Name"/>
+    </div>
+
+    <div class="mb-3">
+        <label for="contactEmail" class="form-label">Email</label>
+        <InputText id="contactEmail" class="form-control" @bind-Value="ContactInformation.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label for="comments" class="form-label">Comments</label>
+        <InputTextArea id="comments" class="form-control" @bind-Value="ContactInformation.Comments" />
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-outline-primary">Submit</button>
+    </div>
+</EditForm>
+
+
+<style>
+    #contactForm {
+        max-width: 700px;
+        min-width: 250px;
+    }
+</style>
