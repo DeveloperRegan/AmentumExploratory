@@ -19,6 +19,7 @@ namespace AmentumExploratory.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             modelBuilder.Entity<Contact>()
                 .Property(s => s.ContactDateTime)
                 .HasDefaultValueSql("GETDATE()");

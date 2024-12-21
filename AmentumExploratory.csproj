@@ -14,5 +14,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
   </ItemGroup>
-
+	<ItemGroup>
+		<InternalsVisibleTo Include="AmentumExploratoryTest" />
+	</ItemGroup>
 </Project>

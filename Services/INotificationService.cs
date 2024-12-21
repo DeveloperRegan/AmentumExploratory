@@ -1,5 +1,9 @@
 ﻿namespace AmentumExploratory.Services;
 
-public class INotificationService
+public interface INotificationService
 {
+    
+    Task SendNotification(string message, bool isSuccess = true);
 }
+
+

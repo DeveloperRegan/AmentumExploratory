@@ -1,21 +1,27 @@
 ﻿using AmentumExploratory.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace AmentumExploratory.Data
+namespace AmentumExploratory.Data;
+
+public class DataAccessService(IDbContextFactory<ExploratoryDbContext> dbContextFactory)
 {
-    public class DataAccessService(IDbContextFactory<ExploratoryDbContext> dbContextFactory)
+    public async Task<List<Contact>> GetContacts()
     {
-        public async Task<List<Contact>> GetContacts()
+        using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        return await dbContext.Contacts.ToListAsync();
+    }
+
+    public async Task<Result> AddContact(Contact contact, CancellationToken cancellationToken=default)
+    {
+        using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        await dbContext.AddAsync(contact, cancellationToken);
+        int changeCount = await dbContext.SaveChangesAsync(cancellationToken);
+
+        if (changeCount > 0)
         {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync();
-            return await dbContext.Contacts.ToListAsync();
+            return Result.Success();
         }
 
-        public async Task AddContact(Contact contact)
-        {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync();
-            await dbContext.AddAsync(contact);
-            await dbContext.SaveChangesAsync();
-        }
+        return Result.Failure(Error.DatabaseError);
     }
 }

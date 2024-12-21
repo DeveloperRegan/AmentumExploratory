@@ -1,49 +1,50 @@
 using AmentumExploratory.Components;
 using AmentumExploratory.Data;
 using AmentumExploratory.Logic;
+using AmentumExploratory.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace AmentumExploratory
+namespace AmentumExploratory;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services
-                .AddRazorComponents()
-                .AddInteractiveServerComponents();
+        builder.Services
+            .AddRazorComponents()
+            .AddInteractiveServerComponents();
 
-            builder.Services
-                .AddDbContextFactory<ExploratoryDbContext>(options =>
-                {
-                    options.UseSqlServer(builder.Configuration.GetConnectionString("Local"), c => c.EnableRetryOnFailure(10));
-                });
-
-            builder.Services.AddScoped<DataAccessService>();
-            builder.Services.AddSingleton<ContextService>();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+        builder.Services
+            .AddDbContextFactory<ExploratoryDbContext>(options =>
             {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Local"), c => c.EnableRetryOnFailure(10));
+            });
 
-            app.UseHttpsRedirection();
+        builder.Services.AddNotificationServices();
+        builder.Services.AddScoped<DataAccessService>();
+        builder.Services.AddSingleton<ContextService>();
 
-            app.UseStaticFiles();
-            app.UseAntiforgery();
-            app.UseContextMiddleware();
+        var app = builder.Build();
 
-            app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
-
-            app.Run();
+        // Configure the HTTP request pipeline.
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
         }
+
+        app.UseHttpsRedirection();
+
+        app.UseStaticFiles();
+        app.UseAntiforgery();
+        app.UseContextMiddleware();
+
+        app.MapRazorComponents<App>()
+            .AddInteractiveServerRenderMode();
+
+        app.Run();
     }
 }
