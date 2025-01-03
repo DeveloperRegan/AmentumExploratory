@@ -1,5 +1,10 @@
 ﻿namespace AmentumExploratory.Services;
 
+public sealed record NotificationServiceType
+{
+    public const string UI = "UI";
+    public const string Text = "Text";
+}
 
 public static class NotificationDI
 {
@@ -12,8 +17,8 @@ public static class NotificationDI
         {
             return key switch
             {
-                "UI" => serviceProvider.GetRequiredService<UINotificationService>(),
-                "Text" => serviceProvider.GetRequiredService<TextFileNotificationService>(),
+                NotificationServiceType.UI => serviceProvider.GetRequiredService<UINotificationService>(),
+                NotificationServiceType.Text => serviceProvider.GetRequiredService<TextFileNotificationService>(),
                 _ => throw new ArgumentException("Invalid notification type", nameof(key))
             };
         });
@@ -21,5 +26,3 @@ public static class NotificationDI
         return services;
     }
 }
-
-

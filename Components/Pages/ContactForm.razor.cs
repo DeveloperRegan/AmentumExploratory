@@ -15,6 +15,10 @@ public partial class ContactForm
     [Inject]
     public required Func<string, INotificationService> NotificationServiceFactory { get; set; }
 
+    [Parameter]
+    public string NotificationType { get; set; } = NotificationServiceType.UI;
+    private INotificationService NotificationService { get; set; }
+
     public Contact ContactInformation { get; set; } = new();
     public List<ContactReason> ContactReasons { get; set; } = 
     [
@@ -24,18 +28,22 @@ public partial class ContactForm
         ContactReason.Other
     ];
 
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        NotificationService = GetNotificationService(NotificationType);
+    }
     public async Task SubmitForm()
     {
         var result =  await DataAccessService.AddContact(ContactInformation);
             
-        var service = GetNotificationService("UI");
         if (result.IsSuccess is false) {
-            await service.SendNotification(result.Error.Name, result.IsSuccess);
+            await NotificationService.SendNotification(result.Error.Name, result.IsSuccess);
             return;
         }
 
 
-        await service.SendNotification($"Successfully added {ContactInformation.ToString()}", result.IsSuccess);
+        await NotificationService.SendNotification($"Successfully added {ContactInformation.ToString()}", result.IsSuccess);
 
 
         NavigationManager.NavigateTo("ContactList");

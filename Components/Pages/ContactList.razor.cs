@@ -9,14 +9,50 @@ public partial class ContactList
     [Inject]
     public required DataAccessService DataAccess { get; set; }
     public List<Contact> Contacts { get; set; } = [];
-    public string SearchText { get; set; } = string.Empty;
+    private string _searchText = string.Empty;
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (_searchText != value)
+            {
+                _searchText = value;
+                _filteredList = null; // Reset the cached list
+                StateHasChanged();
+            }
+        }
+    }
     public List<ContactReason> Filters { get; set; } = [ ContactReason.General, ContactReason.Inquiry, ContactReason.Pricing, ContactReason.Other ];
-    public List<Contact> FilteredList { get; set; } = [];
+    private IReadOnlyList<Contact>? _filteredList;
+
+    public IReadOnlyList<Contact> FilteredList
+    {
+        get
+        {
+            if (_filteredList is not null && _filteredList.Any())
+            {
+                return _filteredList;
+            }
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                _filteredList = Contacts.Where(x=> Filters.Contains(x.Reason)).ToList().AsReadOnly();
+                return _filteredList;
+            }
+
+            return _filteredList ??= Contacts
+        .Where(x => Filters.Contains(x.Reason) &&
+            (
+            x.Email!.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+            x.Name!.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
+        .ToList().AsReadOnly();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         Contacts = await DataAccess.GetContacts();
-        Filter();
+        StateHasChanged();
     }
 
     public void ToggleFilter(ContactReason reason)
@@ -26,13 +62,7 @@ public partial class ContactList
         else
             Filters.Add(reason);
 
-        this.Filter();
-    }
 
-
-    public void Filter()
-    {
-        this.FilteredList = Contacts.Where(x => Filters.Contains(x.Reason) && (x.Email!.Contains(SearchText) || x.Name!.Contains(SearchText)) )
-            .ToList();
+        StateHasChanged();
     }
 }
